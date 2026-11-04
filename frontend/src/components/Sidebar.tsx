@@ -4,8 +4,10 @@ import Sidebaritem from "./SidebarItem"
 import Brainicon from "./icons/Brainicon"
 import Logouticon from "./icons/Logouticon"
 import { useNavigate } from "react-router"
+import Allicon from "./icons/Allicon"
+import Notesicon from "./icons/Notesicon"
 
-function Sidebar() {
+function Sidebar({onChangeContentType} : {onChangeContentType : (a : string) => void}) {
     const navigate = useNavigate();
 
     const onLogout = () => {
@@ -21,12 +23,18 @@ function Sidebar() {
             </div>
 
             <div className="my-6 flex flex-col gap-4">
-                <Sidebaritem text="Youtube" icon={<Videoicon />} />
-                <Sidebaritem text="Twitter" icon={<Twittericon />} />
+                
+                <Sidebaritem onClick= {() => onChangeContentType("all")} text="All" icon={<Allicon />} />
+                <Sidebaritem onClick={() => onChangeContentType("youtube")} text="Youtube" icon={<Videoicon />} />
+                <Sidebaritem onClick={() => onChangeContentType("twitter")} text="Twitter" icon={<Twittericon />} />
+                <Sidebaritem onClick={() => onChangeContentType("notes")} text="Notes" icon={<Notesicon />} />
+                
+                
             </div>
 
-            <div className="mx-4 absolute bottom-10 cursor-pointer" onClick={onLogout}>
+            <div className="mx-4 absolute bottom-10 cursor-pointer flex justify-center items-center gap-2" onClick={onLogout}>
                 <Logouticon/>
+                Log Out
             </div>
         </div>
     )

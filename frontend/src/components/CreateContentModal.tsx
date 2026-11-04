@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import axios from "axios";
 import { BACKENDURL } from "../config";
 import { toast } from "sonner";
+import TextArea from "./TextArea";
 
 interface ModalProps {
     open: boolean,
@@ -18,23 +19,28 @@ function CreateContenModal({ open, onClose }: ModalProps) {
 
     const titleRef = useRef<HTMLInputElement>(null);
     const linkRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
 
     async function onCreatingContent() {
         const title = titleRef.current?.value;
         const link = linkRef.current?.value;
+        const textareaContent = textareaRef.current?.value;
+
 
         try {
             const res = await axios.post(BACKENDURL + "/api/v1/content", {
                 title,
-                link,
-                type
+                link: type === "notes" ? "" : link,
+                type,
+                content: type === "notes" ? textareaContent : "",
+                tags: type === "twitter" ? ["#twitter"] : type === "youtube" ? ["#youtube"] : ["#notes"]
             }, {
-                headers : {
-                    "Authorization" : localStorage.getItem("token")
+                headers: {
+                    "Authorization": localStorage.getItem("token")
                 }
             })
-           
+            console.log(res)
             toast.success("Content added successfully")
             onClose();
 
@@ -60,12 +66,17 @@ function CreateContenModal({ open, onClose }: ModalProps) {
 
                     <div className="flex flex-col gap-4">
                         <Input ref={titleRef} type={"text"} placeholder={"content title"} label={"Title : "} />
-                        <Input ref={linkRef} type={"text"} placeholder={"content link"} label={"Link : "} />
+
+                        {type === "notes" ? <TextArea ref={textareaRef} placeholder={"Make your notes"} label={"Content : "} />
+                            : <Input ref={linkRef} type={"text"} placeholder={"content link"} label={"Link : "} />}
+
                     </div>
 
                     <div className="flex gap-10 items-center my-6 justify-center">
                         <Button text="Youtube" variation={type === "youtube" ? "primary" : "secondary"} size="sm" onClick={() => setType("youtube")} />
                         <Button text="Twitter" variation={type === "twitter" ? "primary" : "secondary"} size="sm" onClick={() => setType("twitter")} />
+                        <Button text="Notes" variation={type === "notes" ? "primary" : "secondary"} size="sm" onClick={() => setType("notes")} />
+
                     </div>
 
                     <div className="flex justify-center my-6">

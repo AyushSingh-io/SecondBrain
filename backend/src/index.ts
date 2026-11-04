@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import "dotenv/config";
 
 import express from "express";
 import jwt from "jsonwebtoken"
@@ -70,7 +69,7 @@ app.post("/api/v1/signin", async (req, res) => {
         {
             _id: user._id
         },
-        process.env.JWTKEY
+        process.env.JWTKEY as string
     )
 
 
@@ -79,14 +78,13 @@ app.post("/api/v1/signin", async (req, res) => {
 })
 
 app.post("/api/v1/content", authMiddleware, async (req, res) => {
-
     const validation = contentValidation.safeParse(req.body);
 
     if (!validation.success) {
         return res.status(400).json({ message: validation.error.issues });
     }
 
-    const { title, link, type } = validation.data;
+    const { title, link, type, tags, content } = validation.data;
 
     //@ts-ignore
     const id = req.user._id;
@@ -94,16 +92,18 @@ app.post("/api/v1/content", authMiddleware, async (req, res) => {
     let newContent;
 
     try {
+
         newContent = await ContentModel.create({
             title,
             link,
-            tags: [],
+            tags: tags,
             type: type,
-            userId: id
+            userId: id,
+            content
         })
 
     } catch (error) {
-        return res.status(500).json({ message: "Error occured while creating content" });
+        return res.status(500).json({ message: "Error occured while creating content", error: error });
     }
 
     return res.status(201).json({ message: "added content successfully", content: newContent })
@@ -112,12 +112,25 @@ app.post("/api/v1/content", authMiddleware, async (req, res) => {
 
 app.get("/api/v1/content", authMiddleware, async (req, res) => {
 
+    const { type } = req.query;
+    let filter: any = {};
+
+    if (!(type === 'all' || type === undefined)) {
+        filter["type"] = type;
+    }
+
     //@ts-ignore
     const id = req.user._id;
 
-    const allContent = await ContentModel.find({
-        userId: id,
-    }).populate("userId", "-password")
+    filter["userId"] = id;
+
+    let allContent;
+    try {
+        allContent = await ContentModel.find(filter).populate("userId", "-password")
+
+    } catch (error) {
+        return res.status(500).json({ message: "Error while fetching contents" })
+    }
 
     return res.status(200).json({ message: "Fetched contents successfully", contents: allContent })
 
@@ -125,7 +138,6 @@ app.get("/api/v1/content", authMiddleware, async (req, res) => {
 
 app.delete("/api/v1/content:contentId", authMiddleware, async (req, res) => {
     const contentId = req.params.contentId
-    console.log(contentId)
 
     //@ts-ignore
     const id = req.user._id;
@@ -134,14 +146,14 @@ app.delete("/api/v1/content:contentId", authMiddleware, async (req, res) => {
         return res.status(400).json({ message: "content Id is required" })
     }
 
-    let deleted ;
+    let deleted;
     try {
-         deleted = await ContentModel.deleteOne({
+        deleted = await ContentModel.deleteOne({
             _id: contentId,
             userId: id
         })
     } catch (error) {
-        return res.status(500).json({message : "error occured while deleting"})
+        return res.status(500).json({ message: "error occured while deleting" })
     }
 
     return res.status(200).json({ message: "content id ", deletedContent: deleted })
@@ -177,7 +189,7 @@ app.post("/api/v1/brain/share", authMiddleware, async (req, res) => {
 
             return res.status(201).json({
                 message: "Share Link has generated",
-                shareLink:  shareLinkToken
+                shareLink: shareLinkToken
             })
 
         } else {
@@ -217,7 +229,15 @@ app.get("/api/v1/brain/:shareLink", authMiddleware, async (req, res) => {
             userId: ownerId
         })
 
-        return res.status(200).json({ message: "successfully fetched sharedLink contents", sharedContent: contents })
+        const owner = await UserModel.findById(ownerId);
+
+        return res.status(200).json({
+            message: "successfully fetched sharedLink contents",
+            sharedContent: {
+                contents: contents,
+                ownerOfBrain: owner?.username
+            }
+        })
 
     } catch (error) {
         return res.status(500).json({ message: "error occured while fetching shared contents" })

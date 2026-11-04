@@ -15,7 +15,7 @@ interface ExtBrainProps {
 
 
 function ExternalBrain(props: ExtBrainProps) {
-    const [extBrain, setExtBrain] = useState([]);
+    const [extBrain, setExtBrain] = useState(null);
 
     const shareLinkInputRef = useRef<HTMLInputElement>(null)
 
@@ -30,14 +30,20 @@ function ExternalBrain(props: ExtBrainProps) {
                     }
                 }
             );
-            console.log(res)
 
+            console.log("respons si ", res.data)
             setExtBrain(res.data.sharedContent)
+            console.log("extbrain", extBrain)
             toast.success("Fetched External Brain successfully")
 
         } catch (error) {
             toast.error(error.message)
         }
+    }
+
+    const onClickCross = () => {
+        setExtBrain(null);
+        props.onClose();
     }
 
     useEffect(() => {
@@ -54,7 +60,7 @@ function ExternalBrain(props: ExtBrainProps) {
                 <div className="w-[80vw] h-[80vh] bg-white p-6 rounded-lg overflow-y-scroll">
 
                     <div className="flex justify-end cursor-pointer mb-2">
-                        <Crossicon onClose={props.onClose} />
+                        <Crossicon onClose={onClickCross} />
                     </div>
 
                     <div className="flex justify-center items-center w-full gap-2">
@@ -62,16 +68,23 @@ function ExternalBrain(props: ExtBrainProps) {
                         <Button variation="secondary" size='md' text="Show" onClick={fetchExternalBrain} />
                     </div>
 
-                    <div className="flex flex-wrap justify-between items-center my-6">
-                        {/* {show content cards} */}
+                    <div className="bg-gray-100 p-4 my-4 rounded-md">
+                     
+                        {!extBrain?.ownerOfBrain ? <div className="text-xl font-medium flex justify-center">No Content</div> : null}
+                        {extBrain?.ownerOfBrain && <div className="text-lg font-medium ml-5 text-indigo-500">{extBrain?.ownerOfBrain}'s Brain :</div>}
 
-                        {extBrain.length > 0 &&
-                            extBrain.map((content : any) => (
-                            <Card key={content.title + content.link} link={content.link} type={content.type} title={content.title} />
-                        ))
 
-                        }
 
+                        {extBrain?.contents?.length &&  <div className="flex flex-wrap justify-start items-center my-4">
+                            {/* {show content cards} */}
+
+                            {extBrain?.contents?.length > 0 &&
+                                extBrain?.contents?.map((content: any) => (
+                                    <Card key={content.title + content.link} link={content.link} type={content.type} title={content.title} createdAt={content.createdAt} tags={content.tags} content={content.content} />
+
+                                ))
+                            }
+                        </div>}
                     </div>
 
                 </div>

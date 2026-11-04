@@ -15,6 +15,10 @@ import Eyeicon from '../components/icons/Eyeicon.tsx'
 function Dashboard() {
     const [open, setOpen] = useState(false)
     const [isOpenExternal, setIsOpenExternal] = useState(false);
+    const [contentType , setContentType] = useState("all");
+
+    console.log("contenttype is ," ,contentType)
+
     const contents = useContent();
 
     const onShareBrain = async () => {
@@ -50,6 +54,11 @@ function Dashboard() {
 
     }
 
+    const onChangeContentType = (newContentType: string) => {
+        console.log("type is  now on dashboard , " , newContentType)
+        setContentType(newContentType);
+    }
+
     return (
         <>
             <div>
@@ -61,7 +70,7 @@ function Dashboard() {
             </div>
 
             <div className='flex'>
-                <Sidebar />
+                <Sidebar onChangeContentType={onChangeContentType} />
 
                 <div className='flex-1 ml-70 p-4 min-h-screen bg-gray-100'>
 
@@ -80,11 +89,18 @@ function Dashboard() {
 
                     <div className='flex flex-wrap my-8'>
                         {
-                            contents && contents.map((content: any) => (
-                                <Card key={content.title + content.link} link={content.link} type={content.type} title={content.title} tags={content.tags}
+                            contents && contents.map((content: any) => {
+
+                                if(content.type === contentType || contentType === "all")
+                                    return  <Card  key={content.title + content.link} link={content.link} type={content.type} title={content.title} tags={content.tags}
                                     onDelete={() => deleteContent(content._id)}
+                                    createdAt={content.createdAt}  content={content.content}
                                 />
-                            ))
+
+                                return null;
+                               
+                            }
+                        )
                         }
 
                         {/* <Card link='https://www.youtube.com/watch?v=YRnjGeQbsHQ&t=1s' type='youtube' title='Dbms one shot' tags={["#youtube", "#study"]}></Card>

@@ -8,7 +8,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = req.headers["authorization"];
     let user;
     try {
-        const userId = jwt.verify(token as string, process.env.JWTKEY);
+        const userId = jwt.verify(token as string, process.env.JWTKEY as string);
 
         user = await UserModel.findById(userId);
         if (!user) {
