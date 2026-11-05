@@ -17,8 +17,6 @@ function Dashboard() {
     const [isOpenExternal, setIsOpenExternal] = useState(false);
     const [contentType , setContentType] = useState("all");
 
-    console.log("contenttype is ," ,contentType)
-
     const contents = useContent();
 
     const onShareBrain = async () => {
@@ -55,7 +53,7 @@ function Dashboard() {
     }
 
     const onChangeContentType = (newContentType: string) => {
-        console.log("type is  now on dashboard , " , newContentType)
+        
         setContentType(newContentType);
     }
 
@@ -70,7 +68,7 @@ function Dashboard() {
             </div>
 
             <div className='flex'>
-                <Sidebar onChangeContentType={onChangeContentType} />
+                <Sidebar currentType={contentType} onChangeContentType={onChangeContentType} />
 
                 <div className='flex-1 ml-70 p-4 min-h-screen bg-gray-100'>
 

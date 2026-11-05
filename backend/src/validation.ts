@@ -6,7 +6,7 @@ export const userValidation = z.object({
 })
 
 export const contentValidation = z.object({
-    title: z.string().min(3).max(100),
+    title: z.string().min(3).max(20),
     link: z.string(),
     type: z.string(),
     tags : z.array(z.string()),

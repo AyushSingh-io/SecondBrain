@@ -59,7 +59,7 @@ function ExternalBrain(props: ExtBrainProps) {
 
                 <div className="w-[80vw] h-[80vh] bg-white p-6 rounded-lg overflow-y-scroll">
 
-                    <div className="flex justify-end cursor-pointer mb-2">
+                    <div className="flex justify-end cursor-pointer mb-2 hover:text-red-500">
                         <Crossicon onClose={onClickCross} />
                     </div>
 

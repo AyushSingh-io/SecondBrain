@@ -1,5 +1,6 @@
 
 import mongoose, { model, Schema } from "mongoose";
+import { maxLength } from "zod";
 
 try {
     console.log(process.env.MONGODB_URI)
@@ -20,7 +21,7 @@ const UserSchema = new Schema({
 }, { timestamps: true })
 
 const ContentSchema = new Schema({
-    title: { type: String, required: true, unique: true },
+    title: { type: String, required: true, unique: true , minlength : 3 , maxLength : 20 },
     link: String,
     // tags: [{ type: mongoose.Types.ObjectId, ref: 'Tag' }],
     tags : {type : [String] , default : []},

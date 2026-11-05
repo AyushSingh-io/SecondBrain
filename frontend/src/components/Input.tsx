@@ -4,10 +4,11 @@ interface InputProps {
     placeholder : string,
     type : string,
     label? : string,
-    ref : Ref<HTMLInputElement>
+    ref : Ref<HTMLInputElement>,
+    maxlength? : number
 }
 
-function Input({ placeholder, type, label , ref} : InputProps) {
+function Input({ placeholder, type, label , ref , maxlength} : InputProps) {
 
 
     return (
@@ -15,6 +16,7 @@ function Input({ placeholder, type, label , ref} : InputProps) {
             <label htmlFor={placeholder}>{label}</label>
             <input
                 ref={ref}
+                maxLength={maxlength}
                 className="px-4 py-2 border rounded-md w-full"
                 type={type}
                 id={placeholder}
